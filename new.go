@@ -1,9 +1,11 @@
 package main
 
 import (
-	"os"
 	"fmt"
 	"github.com/jwaldrip/odin/cli"
+	"os"
+	"path"
+	"strings"
 )
 
 func commandNew() *cli.SubCommand {
@@ -17,7 +19,12 @@ func commandNew() *cli.SubCommand {
 	module.DefineStringFlag(
 		"directory",
 		"sites/all/modules/custom",
-		"A directory path relative to the current Drupal root. Defaults to sites/all/modules/custom.",
+		"A directory path relative to the current Drupal root.",
+	)
+	module.DefineStringFlag(
+		"root",
+		"/path/to/drupal",
+		"A full path to a Drupal install directory.",
 	)
 
 	cmd.DefineSubCommand("site", "Creates a new site skel.", newSite, "name")
@@ -28,10 +35,32 @@ func commandNew() *cli.SubCommand {
 func newModule(c cli.Command) {
 	var name = c.Param("name")
 
-	root, err := drupalRoot()
+	rootFlag := fmt.Sprintf("%s", c.Flag("root"))
+
+	if rootFlag == "/path/to/drupal" {
+
+		var err error
+		rootFlag, err = os.Getwd()
+
+		if err != nil {
+			fmt.Println("Could not get the current directory.")
+			return
+		}
+	} else {
+		rootFlag = path.Clean(rootFlag)
+
+		if strings.Contains(rootFlag, "~") {
+			fmt.Println("Root must be a fully specified path. E.g. it should not contain a \"~\".")
+			return
+		}
+	}
+
+
+	root, err := drupalRoot(rootFlag)
 
 	if err != nil {
 		fmt.Println(err)
+		fmt.Println("You may want to try again with the --root flag.")
 		return
 	}
 
