@@ -32,6 +32,7 @@ func newModule(c cli.Command) {
 
 	if err != nil {
 		fmt.Println(err)
+		fmt.Println("You may want to set the --directory flag.")
 		return
 	}
 

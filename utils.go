@@ -15,7 +15,7 @@ func drupalRoot(path ...string) (root string, err error) {
 		curr, getwdErr = os.Getwd()
 
 		if getwdErr != nil {
-			return "", errors.New("Could not get the current directory.\n")
+			return "", errors.New("Could not get the current directory.")
 		}
 	} else {
 		curr = path[0]
@@ -27,7 +27,7 @@ func drupalRoot(path ...string) (root string, err error) {
 		dir := p.Dir(curr)
 
 		if dir == "/" {
-			err = errors.New("Not inside of a Drupal installation.\n")
+			err = errors.New("Not inside of a Drupal installation.")
 			return "", err
 		}
 
